@@ -19,6 +19,7 @@
 - **Apps** – automatisch wach, solange bestimmte Apps (z. B. Teams, Zoom, Keynote) geöffnet oder im Vordergrund sind.
 - **Maus bewegen, wenn inaktiv** – nach 25 s ohne Eingabe 1 px hin und zurück (z. B. gegen „Abwesend“ in Teams). Benötigt die Freigabe unter *Datenschutz & Sicherheit → Bedienungshilfen*.
 - **Einstellungen** (⌘,) – Anmeldestart, Feierabend-Zeit, Akku-Grenze und App-Liste.
+- **Automatische Updates** über [Sparkle](https://sparkle-project.org) – einmal am Tag, abschaltbar.
 
 | Tasse | Bedeutung |
 |---|---|
@@ -47,14 +48,14 @@ Swift Package mit zwei Modulen:
 - `Sources/WachmacherCore/` – reine Logik ohne UI (`AwakeEngine`: Timer, Akku-Schutz, App-Auslöser, Klick-Verhalten), mit Tests in `Tests/`
 - `Sources/Wachmacher/`
   - `App/` – Einstiegspunkt und `AppDelegate`
-  - `Core/` – `Preferences` (UserDefaults), `Services/AwakeController` (verbindet Logik mit System), `Services/PowerService` (IOKit, Akku, Maus)
+  - `Core/` – `Preferences` (UserDefaults), `Services/AwakeController` (verbindet Logik mit System), `Services/PowerService` (IOKit, Akku, Maus), `Services/UpdateService` (Sparkle)
   - `Features/StatusItem/` – Menüleisten-Symbol, Menü, gezeichnete Tasse
   - `Features/Settings/` – Einstellungsfenster (SwiftUI)
 - `Resources/PrivacyInfo.xcprivacy` – Datenschutz-Manifest
 - `Tools/make-icon.swift` – zeichnet das App-Icon
-- `scripts/` – `build.sh` (App bauen), `release.sh` (DMG + Notarisierung), `publish-site.sh` (Website)
+- `scripts/` – `build.sh` (App bauen), `release.sh` (DMG, Notarisierung, Appcast), `update-appcast.py`, `publish-site.sh` (Website)
 - `site/` – Website auf GitHub Pages: Startseite mit interaktiver Menüleiste, Download, Datenschutz, Impressum
-- `docs/release.md` – Ablauf für neue Versionen
+- `docs/release.md` – Ablauf für neue Versionen, `docs/changelog/` – Neuerungen je Version
 
 ## Lizenz
 

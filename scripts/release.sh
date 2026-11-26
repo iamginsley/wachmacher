@@ -14,6 +14,7 @@ if [[ -z "${NOTARY_PROFILE:-}" ]]; then
   security find-generic-password -s "com.apple.gke.notary.tool" -a "com.apple.gke.notary.tool.saved-creds.wachmacher" \
     >/dev/null 2>&1 || NOTARY_PROFILE=smoll-notch
 fi
+SPARKLE_BIN=.build/artifacts/sparkle/Sparkle/bin
 SKIP_NOTARIZE=false
 [[ "${1:-}" == "--skip-notarize" ]] && SKIP_NOTARIZE=true
 
@@ -26,7 +27,10 @@ swift test --quiet
 scripts/build.sh --release
 APP=build/Wachmacher.app
 VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP/Contents/Info.plist")
+BUILD=$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$APP/Contents/Info.plist")
 DMG=$OUT/Wachmacher-$VERSION.dmg
+NOTES=docs/changelog/$VERSION.md
+[[ -f $NOTES ]] || { echo "✗ Missing release notes: $NOTES"; exit 1; }
 
 echo "▸ Verifying signature"
 codesign --verify --deep --strict --verbose=1 "$APP"
@@ -53,6 +57,16 @@ xcrun notarytool submit $DMG --keychain-profile "$NOTARY_PROFILE" --wait
 xcrun stapler staple $DMG
 spctl --assess --type open --context context:primary-signature --verbose $DMG
 
+echo "▸ Signing the update for Sparkle and writing site/appcast.xml"
+# Private key lives in the login keychain (account "wachmacher"), see docs/release.md.
+ED_SIGNATURE=$($SPARKLE_BIN/sign_update --account wachmacher -p $DMG)
+LENGTH=$(stat -f %z $DMG)
+python3 -I scripts/update-appcast.py "$VERSION" "$BUILD" \
+  "https://github.com/iamginsley/wachmacher/releases/download/v$VERSION/Wachmacher-$VERSION.dmg" \
+  "$LENGTH" "$ED_SIGNATURE" "$NOTES"
+
 # Stable name for https://github.com/iamginsley/wachmacher/releases/latest/download/Wachmacher.dmg
 cp $DMG $OUT/Wachmacher.dmg
-echo "✓ $DMG (upload $OUT/Wachmacher.dmg to the release, the website links to it)"
+echo "✓ $DMG"
+echo "  Upload both $DMG (Sparkle) and $OUT/Wachmacher.dmg (website) to release v$VERSION,"
+echo "  then commit site/appcast.xml and run scripts/publish-site.sh."

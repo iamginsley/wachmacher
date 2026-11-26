@@ -4,16 +4,18 @@ import SwiftUI
 @MainActor
 final class SettingsWindowController {
     private let controller: AwakeController
+    private let updates: UpdateService
     private var window: NSWindow?
 
-    init(controller: AwakeController) {
+    init(controller: AwakeController, updates: UpdateService) {
         self.controller = controller
+        self.updates = updates
     }
 
     func show() {
         if window == nil {
             let hosting = NSHostingController(
-                rootView: SettingsView(preferences: controller.preferences, controller: controller)
+                rootView: SettingsView(preferences: controller.preferences, controller: controller, updates: updates)
             )
             let window = NSWindow(contentViewController: hosting)
             window.title = "Wachmacher – Einstellungen"

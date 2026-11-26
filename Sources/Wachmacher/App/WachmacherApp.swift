@@ -17,11 +17,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var controller: AwakeController?
     private var statusItem: StatusItemController?
     private var settings: SettingsWindowController?
+    private var updates: UpdateService?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let controller = AwakeController(preferences: Preferences())
-        let settings = SettingsWindowController(controller: controller)
-        let statusItem = StatusItemController(controller: controller) { settings.show() }
+        let updates = UpdateService()
+        let settings = SettingsWindowController(controller: controller, updates: updates)
+        let statusItem = StatusItemController(
+            controller: controller,
+            openSettings: { settings.show() },
+            checkForUpdates: { updates.checkForUpdates() }
+        )
+        self.updates = updates
         controller.onUpdate = { [weak statusItem] in statusItem?.refresh() }
         self.controller = controller
         self.settings = settings
