@@ -27,3 +27,7 @@ Die App wird ad-hoc signiert. Nach jedem Neubau muss die Bedienungshilfen-Freiga
 - `Sources/WachmacherApp.swift` – SwiftUI-`MenuBarExtra` und die Wach-Logik
 - `Tools/make-icon.swift` – zeichnet das App-Icon
 - `build.sh` – kompiliert, erzeugt `.icns`, `Info.plist` und signiert
+
+## Lizenz
+
+[MIT](LICENSE)
