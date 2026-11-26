@@ -1,8 +1,14 @@
 <p align="center"><img src="docs/icon.png" width="128" alt="Wachmacher-Icon"></p>
 
-# Wachmacher ☕️
+<h1 align="center">Wachmacher ☕️</h1>
 
-Kleine Menüleisten-App für macOS, die den Mac wach hält – kein Bildschirmschoner, keine Sperre.
+<p align="center">Kleine Menüleisten-App für macOS, die den Mac wach hält – kein Bildschirmschoner, keine Sperre.</p>
+
+<p align="center">
+  <a href="https://iamginsley.github.io/wachmacher/download.html"><b>⬇︎ Für Mac laden</b></a>
+  &nbsp;·&nbsp; <a href="https://iamginsley.github.io/wachmacher/">Website</a>
+  &nbsp;·&nbsp; kostenlos, signiert und von Apple notarisiert · macOS 14+ · Apple Silicon und Intel
+</p>
 
 ## Funktionen
 
@@ -26,9 +32,10 @@ Kleine Menüleisten-App für macOS, die den Mac wach hält – kein Bildschirmsc
 Voraussetzung: macOS 14+, Xcode 16+ (Swift 6).
 
 ```bash
-./build.sh            # baut build/Wachmacher.app
-./build.sh --install  # baut, kopiert nach /Applications und startet
-swift test            # Unit-Tests der Entscheidungslogik
+scripts/build.sh            # baut build/Wachmacher.app (ad-hoc signiert, nur für diesen Mac)
+scripts/build.sh --install  # baut, kopiert nach /Applications und startet
+swift test                  # Unit-Tests der Entscheidungslogik
+scripts/release.sh          # notarisierte DMG, siehe docs/release.md
 ```
 
 Die App wird ad-hoc signiert. Nach jedem Neubau muss die Bedienungshilfen-Freigabe ggf. neu erteilt werden.
@@ -43,8 +50,11 @@ Swift Package mit zwei Modulen:
   - `Core/` – `Preferences` (UserDefaults), `Services/AwakeController` (verbindet Logik mit System), `Services/PowerService` (IOKit, Akku, Maus)
   - `Features/StatusItem/` – Menüleisten-Symbol, Menü, gezeichnete Tasse
   - `Features/Settings/` – Einstellungsfenster (SwiftUI)
+- `Resources/PrivacyInfo.xcprivacy` – Datenschutz-Manifest
 - `Tools/make-icon.swift` – zeichnet das App-Icon
-- `build.sh` – baut, erzeugt `.icns` und `Info.plist`, signiert
+- `scripts/` – `build.sh` (App bauen), `release.sh` (DMG + Notarisierung), `publish-site.sh` (Website)
+- `site/` – Website auf GitHub Pages: Startseite mit interaktiver Menüleiste, Download, Datenschutz, Impressum
+- `docs/release.md` – Ablauf für neue Versionen
 
 ## Lizenz
 
