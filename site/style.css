@@ -213,3 +213,11 @@ footer a:hover { color: var(--text); }
 .dl-req { color: var(--text-3); font-size: 14px; margin: 18px 0 0; }
 .install-list { text-align: left; max-width: 360px; margin: 24px auto 0; padding-left: 1.2em; color: var(--text-2); display: grid; gap: 6px; }
 .install-list b { color: var(--text); font-weight: 600; }
+
+/* Plain landing page */
+.plain { max-width: 760px; }
+.plain h2 { font-size: 28px; letter-spacing: -0.02em; margin: 0 0 18px; }
+.feature-list { margin: 0; padding-left: 1.2em; display: grid; gap: 10px; color: var(--text-2); }
+.feature-list b { color: var(--text); font-weight: 600; }
+.source { color: var(--text-3); font-size: 15px; margin-top: 20px; }
+section { padding-top: 72px; }
