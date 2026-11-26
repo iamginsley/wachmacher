@@ -6,6 +6,7 @@ import WachmacherCore
 final class StatusItemController: NSObject, NSMenuDelegate {
     private let controller: AwakeController
     private let openSettings: () -> Void
+    private let checkForUpdates: () -> Void
     private let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
     private static let durations: [(String, TimeInterval)] = [
@@ -16,9 +17,10 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         ("4 Stunden", 4 * 60 * 60),
     ]
 
-    init(controller: AwakeController, openSettings: @escaping () -> Void) {
+    init(controller: AwakeController, openSettings: @escaping () -> Void, checkForUpdates: @escaping () -> Void) {
         self.controller = controller
         self.openSettings = openSettings
+        self.checkForUpdates = checkForUpdates
         super.init()
         if let button = item.button {
             button.target = self
@@ -96,6 +98,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         mouse.state = controller.preferences.moveMouse ? .on : .off
         menu.addItem(mouse)
         menu.addItem(action("Einstellungen …", #selector(showSettings), key: ","))
+        menu.addItem(action("Nach Updates suchen …", #selector(searchUpdates)))
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Wachmacher beenden",
                                 action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
@@ -129,6 +132,8 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     }
 
     @objc private func showSettings() { openSettings() }
+
+    @objc private func searchUpdates() { checkForUpdates() }
 
     // MARK: Presentation
 

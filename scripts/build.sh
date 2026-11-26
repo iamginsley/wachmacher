@@ -7,8 +7,10 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-VERSION=1.1
-BUILD=2
+# Overridable for testing the update flow with an older local build.
+VERSION=${VERSION:-1.2}
+BUILD=${BUILD:-3}
+FEED_URL=${FEED_URL:-https://iamginsley.github.io/wachmacher/appcast.xml}
 TEAM_ID=2567P974L9   # personal team, never the INNIO team
 
 MODE="${1:-}"
@@ -25,6 +27,8 @@ else
   BIN="$(swift build -c release --show-bin-path)/Wachmacher"
 fi
 cp "$BIN" "$APP/Contents/MacOS/Wachmacher"
+mkdir -p "$APP/Contents/Frameworks"
+ditto "$(dirname "$BIN")/Sparkle.framework" "$APP/Contents/Frameworks/Sparkle.framework"
 
 echo "▸ App icon"
 ICONSET=build/AppIcon.iconset
@@ -55,6 +59,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>LSApplicationCategoryType</key><string>public.app-category.utilities</string>
   <key>LSUIElement</key><true/>
   <key>NSHumanReadableCopyright</key><string>© 2026 Dominik Gintsberger</string>
+  <key>SUFeedURL</key><string>$FEED_URL</string>
+  <key>SUPublicEDKey</key><string>hih/nlF8+blaM8jgJ8fhFe5MLsR7yxTMiNB8NCzwCOU=</string>
 </dict>
 </plist>
 PLIST
@@ -64,10 +70,18 @@ if [[ "$MODE" == "--release" ]]; then
   IDENTITY=$(security find-identity -v -p codesigning | grep "Developer ID Application" | grep "($TEAM_ID)" \
     | head -1 | sed -E 's/.*"(.*)"/\1/')
   [[ -n "$IDENTITY" ]] || { echo "✗ No Developer ID Application certificate for team $TEAM_ID"; exit 1; }
-  codesign --force --options runtime --timestamp --sign "$IDENTITY" "$APP"
+  SIGN=(codesign --force --options runtime --timestamp --sign "$IDENTITY")
 else
-  codesign --force --sign - "$APP"
+  SIGN=(codesign --force --sign -)
 fi
+# Sparkle must be signed inside out: XPC services, helpers, framework, then the app.
+SPARKLE="$APP/Contents/Frameworks/Sparkle.framework/Versions/B"
+"${SIGN[@]}" "$SPARKLE/XPCServices/Installer.xpc"
+"${SIGN[@]}" --preserve-metadata=entitlements "$SPARKLE/XPCServices/Downloader.xpc"
+"${SIGN[@]}" "$SPARKLE/Autoupdate"
+"${SIGN[@]}" "$SPARKLE/Updater.app"
+"${SIGN[@]}" "$APP/Contents/Frameworks/Sparkle.framework"
+"${SIGN[@]}" "$APP"
 echo "✓ $APP ($VERSION, build $BUILD)"
 
 if [[ "$MODE" == "--install" ]]; then

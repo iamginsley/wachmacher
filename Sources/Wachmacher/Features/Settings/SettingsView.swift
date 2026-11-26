@@ -6,7 +6,15 @@ import WachmacherCore
 struct SettingsView: View {
     @Bindable var preferences: Preferences
     let controller: AwakeController
+    @Bindable var updates: UpdateService
     @State private var hasAccessibility = PowerService.hasAccessibility
+
+    private var versionText: String {
+        let info = Bundle.main.infoDictionary
+        let version = info?["CFBundleShortVersionString"] as? String ?? "–"
+        let build = info?["CFBundleVersion"] as? String ?? "–"
+        return "\(version) (\(build))"
+    }
 
     /// Common call and presentation apps offered as one-click suggestions when installed.
     private static let suggestions: [WatchedApp] = [
@@ -24,6 +32,7 @@ struct SettingsView: View {
             generalSection
             batterySection
             appsSection
+            updatesSection
         }
         .formStyle(.grouped)
         .frame(width: 480)
@@ -139,6 +148,24 @@ struct SettingsView: View {
             Text("Apps")
         } footer: {
             Text("Ein Klick auf die Tasse schaltet trotzdem aus – bis die App wieder geschlossen wird.")
+        }
+    }
+
+    // MARK: Updates
+
+    private var updatesSection: some View {
+        Section {
+            Toggle("Automatisch nach Updates suchen", isOn: $updates.automaticallyChecks)
+            LabeledContent("Version") {
+                HStack {
+                    Text(versionText).monospacedDigit()
+                    Button("Jetzt suchen") { updates.checkForUpdates() }
+                }
+            }
+        } header: {
+            Text("Updates")
+        } footer: {
+            Text("Einmal am Tag fragt Wachmacher bei GitHub nach einer neuen Version. Dabei werden keine weiteren Daten übertragen.")
         }
     }
 

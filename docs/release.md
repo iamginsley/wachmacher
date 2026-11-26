@@ -16,24 +16,34 @@ does not allow. It ships as a Developer ID signed, notarized DMG as a GitHub Rel
    ```
    Override with `NOTARY_PROFILE=...`.
 
+3. **Sparkle update key**: an EdDSA key in the login keychain (account `wachmacher`), created with
+   `.build/artifacts/sparkle/Sparkle/bin/generate_keys --account wachmacher`. The public key is
+   `SUPublicEDKey` in `scripts/build.sh`. **Back it up** (`generate_keys --account wachmacher -x <file>`,
+   keep the file outside the repo): without it, installed copies can no longer be updated.
+
 ## Every release
 
-1. Bump `VERSION` (user-visible) and `BUILD` (always) in `scripts/build.sh`.
+1. Bump `VERSION` (user-visible) and `BUILD` (always) in `scripts/build.sh`. Sparkle compares `BUILD`.
+   Write the release notes to `docs/changelog/<version>.md` (German, bullets).
 2. Run:
    ```
    scripts/release.sh
    ```
    It runs the tests, builds a universal binary, signs with Developer ID and hardened runtime, builds the
-   DMG (with a link to Programme), notarizes, staples and checks Gatekeeper. Result:
-   `build/release/Wachmacher-<version>.dmg` plus a copy named `Wachmacher.dmg`. Upload the copy: the
-   website downloads `releases/latest/download/Wachmacher.dmg`.
+   DMG (with a link to Programme), notarizes, staples and checks Gatekeeper, signs the DMG for Sparkle
+   and adds the version to `site/appcast.xml`. Result: `build/release/Wachmacher-<version>.dmg` (Sparkle
+   downloads this one) plus a copy named `Wachmacher.dmg` (the website links to
+   `releases/latest/download/Wachmacher.dmg`). Upload both.
 3. Smoke test: open the DMG, drag the app to Programme, start it. The cup appears; click toggles,
    right click opens the menu, a timer empties the cup, the settings open with ⌘,.
    `pmset -g assertions | grep Wachmacher` shows the assertions while awake.
-4. Commit the version bump, tag and publish:
+4. Commit the version bump, changelog and `site/appcast.xml`, merge, then tag and publish. The site
+   must go out **after** the release, otherwise Sparkle offers a download that does not exist yet:
    ```
    git tag v<version> && git push origin v<version>
-   gh release create v<version> build/release/Wachmacher.dmg --title "Wachmacher <version>" --notes "..."
+   gh release create v<version> build/release/Wachmacher-<version>.dmg build/release/Wachmacher.dmg \
+     --title "Wachmacher <version>" --notes-file docs/changelog/<version>.md
+   scripts/publish-site.sh
    ```
 
 `scripts/release.sh --skip-notarize` skips notarization for a quick local check.
@@ -55,4 +65,5 @@ release needs no website change. Preview locally with `python3 -m http.server 41
 - [ ] DMG notarized and stapled (`spctl` says "accepted, source=Notarized Developer ID")
 - [ ] Smoke test
 - [ ] Privacy policy current (`site/datenschutz.html`), `Resources/PrivacyInfo.xcprivacy` unchanged unless data use changed
-- [ ] Tag pushed, GitHub Release with `Wachmacher.dmg`
+- [ ] `site/appcast.xml` has the new version
+- [ ] Tag pushed, GitHub Release with both DMGs, then site published
