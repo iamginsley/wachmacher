@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>Wachmacher</title>
+    <link>https://iamginsley.github.io/wachmacher/appcast.xml</link>
+    <description>Updates für Wachmacher</description>
+    <language>de</language>
+    <item>
+      <title>Version 1.2</title>
+      <pubDate>Thu, 26 Nov 2026 20:28:09 GMT</pubDate>
+      <sparkle:version>3</sparkle:version>
+      <sparkle:shortVersionString>1.2</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <description><![CDATA[<p>Wachmacher hält sich ab jetzt selbst aktuell.</p><ul><li>Automatische Updates: Einmal am Tag sucht Wachmacher nach einer neuen Version, ein Klick installiert sie</li><li>Neu im Menü: „Nach Updates suchen …“</li><li>In den Einstellungen: Updates ein- oder ausschalten und die installierte Version sehen</li></ul>]]></description>
+      <enclosure url="https://github.com/iamginsley/wachmacher/releases/download/v1.2/Wachmacher-1.2.dmg" length="1895324" type="application/octet-stream" sparkle:edSignature="4vZVlS5/GlvvHyqNRMHCG2GGoxYunMINx9TPCjvf0Dvatardc/mYNWqswds+FfEQrVL3zji0+VC0p1eB4HSBDg=="/>
+    </item>
+  </channel>
+</rss>
