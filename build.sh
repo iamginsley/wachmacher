@@ -18,9 +18,8 @@ for s in 16 32 128 256 512; do
 done
 iconutil -c icns "$ICONSET" -o "$APP/Contents/Resources/AppIcon.icns"
 
-swiftc -O -swift-version 6 -parse-as-library \
-  -target arm64-apple-macos14 \
-  Sources/*.swift -o "$APP/Contents/MacOS/Wachmacher"
+swift build -c release --product Wachmacher
+cp "$(swift build -c release --show-bin-path)/Wachmacher" "$APP/Contents/MacOS/Wachmacher"
 
 cat > "$APP/Contents/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -32,8 +31,8 @@ cat > "$APP/Contents/Info.plist" <<'PLIST'
   <key>CFBundleIdentifier</key><string>de.gintsberger.wachmacher</string>
   <key>CFBundleExecutable</key><string>Wachmacher</string>
   <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>1.0</string>
-  <key>CFBundleVersion</key><string>1</string>
+  <key>CFBundleShortVersionString</key><string>1.1</string>
+  <key>CFBundleVersion</key><string>2</string>
   <key>LSMinimumSystemVersion</key><string>14.0</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>LSUIElement</key><true/>
